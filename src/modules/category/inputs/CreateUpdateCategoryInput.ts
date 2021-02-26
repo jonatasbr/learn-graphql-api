@@ -6,4 +6,8 @@ export class CreateUpdateCategoryInput {
   @Field()
   @MaxLength(255)
   name: string;
+
+  @Field()
+  @MaxLength(255)
+  slug: string;
 }
