@@ -1,13 +1,21 @@
-import express from 'express';
+import 'reflect-metadata';
+import { createConnection } from 'typeorm';
+import { ApolloServer } from 'apollo-server';
+import { buildSchema } from 'type-graphql';
 
-const app = express();
+import CategoryResolver from './modules/category/resolvers/CategoryResolver';
 
-app.get('/', (request, response) => {
-  console.log('teste');
+const app = async () => {
+  await createConnection();
 
-  return response.json({ message: 'teste' });
-});
+  const schema = await buildSchema({
+    resolvers: [CategoryResolver], // add this
+  });
 
-app.listen(4000, () => {
-  console.log('Server started on port 4000');
-});
+  const server = new ApolloServer({ schema });
+  await server.listen(4000);
+
+  console.log('Server has started!');
+};
+
+app();
