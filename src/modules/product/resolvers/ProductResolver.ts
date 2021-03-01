@@ -1,8 +1,12 @@
+import { GraphQLUpload } from 'apollo-server';
 import { Resolver, Query, Mutation, Arg } from 'type-graphql';
+import { createWriteStream } from 'fs';
+
 import Category from '../../category/entities/Category';
 import { CategoryBySlug } from '../../category/inputs/CategoryBySlug';
 import Product from '../entities/Product';
 import { CreateProductInput } from '../inputs/CreateProductInput';
+import UploadInput from '../inputs/UploadInput';
 
 @Resolver()
 class ProductResolver {
@@ -68,6 +72,21 @@ class ProductResolver {
 
     return true;
   }
-}
 
+  @Mutation(() => Boolean)
+  async uploadTest(
+    @Arg('file', () => GraphQLUpload)
+    file: UploadInput
+  ): Promise<boolean> {
+    return new Promise((resolve, reject) =>
+      file
+        .createReadStream()
+        .pipe(
+          createWriteStream(__dirname + `/../../../images/${file.filename}`)
+        )
+        .on('finish', () => resolve(true))
+        .on('error', () => reject(false))
+    );
+  }
+}
 export default ProductResolver;
